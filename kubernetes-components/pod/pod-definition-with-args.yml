@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu-sleeper
+  image: ubuntu-sleeper
+  command: ["sleeps2.0"] #this line replace the entrypoint value in the docker file
+  args: ["10"] #this replace the value of the CMD in docker definition file
