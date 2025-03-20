@@ -28,3 +28,20 @@ spec:
       envFrom:
         - configMapRef:
             name: app-config
+
+---
+#Create pod with ConfigMap as volume
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simple-webapp-color
+spec:
+  containers:
+    - name: simple-webapp-color
+      image: simple-webapp-color
+      ports:
+        - containerPort: 8080
+      volumes:
+        - name: app-config-volume
+          configMap:
+            name: app

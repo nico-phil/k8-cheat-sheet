@@ -1,0 +1,61 @@
+#pod definition for the job
+apiVersion: v1
+kind: Pod
+metadata:
+  name: math-pod
+  labels:
+    app: math-pod
+spec:
+  containers:
+    - name: math-add
+      image: ubuntu
+      command: ["expr", "3", "+", "2"]
+  restartPolicy: Never
+
+---
+#Job def. in the templete section, we job paste the pod spec
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: math-add-job
+spec:
+  template:
+    spec:
+      containers:
+        - name: math-add
+          image: ubuntu
+          command: ["expr", "3", "+", "2"]
+      restartPolicy: Never
+
+---
+#create multiple pod in a job sequentially
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: math-add-job
+spec:
+  completions: 3 #the pod will created one after the other
+  template:
+    spec:
+      containers:
+        - name: math-add
+          image: ubuntu
+          command: ["expr", "3", "+", "2"]
+      restartPolicy: Never
+
+---
+#create multiple pod in a job in paralell
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: math-add-job
+spec:
+  completions: 3
+  parallelism: 3 #this will make the jobs run in parallel
+  template:
+    spec:
+      containers:
+        - name: math-add
+          image: ubuntu
+          command: ["expr", "3", "+", "2"]
+      restartPolicy: Never

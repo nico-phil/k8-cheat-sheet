@@ -1,0 +1,17 @@
+#here is the taint for the node node1, created with kubectl
+#kubectl taint nodes node-1 app=blue:NoSchedule
+
+#here is the toleration for the pod to be place on the node1
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-app
+spec:
+  containers:
+    - name: web-app
+      image: web-app
+  tolerations:
+    - key: "app"
+      operator: "Equal"
+      value: "blue"
+      effect: "NoSchedule"

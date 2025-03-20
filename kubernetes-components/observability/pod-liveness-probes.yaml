@@ -1,0 +1,78 @@
+#POD with liveness probe for http to check if an app is healty
+#it's the same things as readiness-probes
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simple-webapp
+  labels:
+    app: simple-webapp
+spec:
+  containers:
+    - name: simple-webapp
+      image: simple-webapp
+      ports:
+        - containerPort: 8080
+      livenessProbe:
+        httpGet:
+          path: /api/ready
+          port: 8080
+
+---
+#POD with livenessProbe for tcp
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simple-webapp
+  labels:
+    app: simple-webapp
+spec:
+  containers:
+    - name: simple-webapp
+      image: simple-webapp
+      ports:
+        - containerPort: 8080
+      livenessProbe:
+        tcpSocket:
+          port: 3360
+
+---
+#POD with livenessProbe  for running command
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simple-webapp
+  labels:
+    app: simple-webapp
+spec:
+  containers:
+    - name: simple-webapp
+      image: simple-webapp
+      ports:
+        - containerPort: 8080
+      livenessProbe:
+        exec:
+          command:
+            - cat
+            - app/is_ready
+
+---
+#POD WITH readinessProbe for http and orther params
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simple-webapp
+  labels:
+    app: simple-webapp
+spec:
+  containers:
+    - name: simple-webapp
+      image: simple-webapp
+      ports:
+        - containerPort: 8080
+      readinessProbe:
+        httpGet:
+          path: /api/ready
+          port: 8080
+        initialDelaySeconds: 10 # set delay to prod
+        periodSeconds: 5 #set how often to prob
+        failureThreshold: 8 #set threshold to prod

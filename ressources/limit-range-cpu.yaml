@@ -1,0 +1,18 @@
+#limit range can help you define default values to be set for containers with in a pod
+#cpu limit range for resource
+
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-ressource-constraint
+spec:
+  limits:
+    - default:
+        cpu: 500m
+      defaultRequest:
+        cpu: 500m
+      max:
+        cpu: "1"
+      min:
+        cpu: 100m
+      type: container

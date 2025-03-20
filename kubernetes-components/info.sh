@@ -4,6 +4,21 @@ minikube start
 #stop minikube
 minikube stop
 
+#anable metric server on minikube
+mikikube addons enable metrics-server
+
+#deploy reqquired component for metrics. this command create a set of pods, services and roles
+#to anable metric server 
+kubectl create -f deploy/1.8+/
+
+
+#cluster performace can be views. this command return the CPU and memory consuption for each node
+kubectl top node
+
+#view performace metric of pods. this command return the CPU and memory consuption for each pod
+kubectl top pod
+
+
 #get nodes
 kubectl get nodes
 
@@ -23,11 +38,24 @@ kubectl get pods
 #info about the pod
 kubectl describe pod my-app-pod
 
+#filter pod with label
+kubect get pod --selector app=App1
+
+#count pod
+kubect get pod --selector app=App1 --no-headers | wc -l
+
+#get pods with with multiple labels
+kubectl get pods --selector env=prod,bu=finance,tier=frontend
+
 #delete pod
 kubectl delete pod my-pod
 
 #generate pod quickly and put it in file, so that you can modify it
 kubectl run nginx --image=nginx --dry-run=client -o yaml > nginx-pod.yaml
+
+#see log in the pod
+kubectl logs pod-name
+
 
 
 
@@ -38,7 +66,7 @@ kubectl run nginx --image=nginx --dry-run=client -o yaml > nginx-pod.yaml
 kubectl apply -f replicaset-definition.yml
 
 #info about replicat set
-kubectl get replicaset
+kubectl get replicasets
 
 #delete replicaset and underline pod
 kubectl delete replicaset myapp-deplicaset
@@ -55,11 +83,15 @@ kubectl scale --replicas=6 -f replicatset-definition.yml
 #Create a deployment quickly
 kubectl create deployment --image=nginx nginx
 
+
 #Generate Deployment YAML file (-o yaml). Don't create it(--dry-run)
 kubectl create deployment --image=nginx nginx --dry-run=client -o yaml
 
 #deploy
 kubectl apply -f deployment-defintion.yaml
+
+#create deployment with record
+kubectl apply -f deployment-defintion.yaml --record
 
 #get deployments
 kubectl get deployments
@@ -67,16 +99,27 @@ kubectl get deployments
 #update the file with edit
 kubectl edit deployment myapp-deployment
 
-#update image, choose one of them
+#update image, you choose one of them
 kubectl apply -f deployment-defintion.yaml
-kubectl set image deployment myapp-deployment nginx-container=nginx:1.9.1
+kubectl set image deployment myapp-deployment simple-webapp=nginx:1.9.1
 
-#status
+#get rollout status(in simple term, deployemtn status)
 kubectl rollout status deployment/myapp-deployment
+
+#get rollout history 
 kubectl rollout history deployment/myapp-deployment
+
+#Check the status of each revision individually
+kubectl rollout history deployment nginx --revision=1
+
+#We can use the --record flag to save the command used to create/update a deployment against the revision number.
+kubectl set image deployment nginx nginx=nginx:1.17 --record
 
 #rollback deployment
 kubectl rollout undo deployment/myapp-deployment
+
+#To rollback to specific revision we will use the --to-revision flag.
+kubectl rollout undo deployment nginx --to-revision=1
 
 #get all objects
 kubectl get all
@@ -86,6 +129,8 @@ kubectl create deployment nginx --image=nginx --replicas=4
 
 #You can also scale deployment using the kubectl scale command.
 kubectl scale deployment nginx --replicas=4
+
+
 
 #-------- Service---------------------------------------------------
 
@@ -209,7 +254,7 @@ kubectl get confimaps
 kubectl describe configmaps
 
 
-----------------------------Secrets-----------------------------
+#----------------------------Secrets----------------------------------------
 #create secret imperative way
 kubectl create secret generic \ 
     app-secret-name --from-literal=DB_HOST=mysql
@@ -217,7 +262,7 @@ kubectl create secret generic \
                     --from-LITERAL=DB_PASSWORD=password
 
 #create secret imperaive way with file
-kubeclt crete secret generic \
+kubeclt create secret generic \
     app-secret-name --from-file=app_secret.properties
 
 #create secret with yaml file
@@ -231,6 +276,13 @@ kubectl describe secrets
 
 #get secrets data
 kubectl get secret app-secret -o yaml 
+
+#convert data to base64 in the terminal
+echo -n "paswrd" | base64
+
+#decode base64 data in the terminal
+echo -n "cGFzd3Jk" | base64 --decode
+
 
 
 
@@ -274,6 +326,56 @@ kubectl exec -it my-kubernetes-dashboard -- cat /var/run/secrets/kubernetes.io/s
 
 
         
+#---------------------taint and toleration----------------------
+
+#taint a node
+#pod that do not tolerant the taint "taint-effect" can't be schdedule on the node
+#3 type of taint: NoSchedule, PreferNoSchedule, NoExecute
+kubectl taint nodes node-name key=value:taint-effect
+kubectl taint nodes node-1 app=blue:NoSchedule
+
+#add toleration to pod. you should go to the definition file and add the toleration
+
+
+#view the taint of node(or the master)
+kubectl describe node kubemaster | grep Taint
+
+#untaint a node
+kubectl taint nodes controlplane node-role.kubernetes.io/control-plane:NoSchedule-
 
 
 
+#---------------------------NODES-----------------------------------
+#label a node
+kubectl lablel nodes <node-name> <label-key>=<label-value>
+kuctl label nodes node-1 size=Large
+
+#add a nodeselector to the the pod, so that the place will be placed
+#in the node with the corresponding label
+
+
+#------------------------LOGS--------------------------------------
+#view logs in container
+#-f => to stream the logs life
+docker logs -f containername
+
+#view logs in kubernetes
+kubectl logs -f pod-name
+
+#if you have multiple containers in the pod, you should specify the containair name
+kubectl logs -f pod-name container-name
+
+
+
+#------------------Job-----------------
+#create job
+kubectl create -f job-definition.yaml
+
+#get jobs
+kubectl get jobs
+
+#see log in the pod
+kubectl logs pod-name
+
+#delete job
+kubectl delete job math-add-job
