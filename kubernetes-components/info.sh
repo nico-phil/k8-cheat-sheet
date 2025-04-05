@@ -124,6 +124,9 @@ kubectl rollout undo deployment nginx --to-revision=1
 #get all objects
 kubectl get all
 
+#get deployments in all namespace
+kubectl get deployments -A
+
 #Generate Deployment with 4 Replicas
 kubectl create deployment nginx --image=nginx --replicas=4
 
@@ -134,6 +137,11 @@ kubectl scale deployment nginx --replicas=4
 
 #-------- Service---------------------------------------------------
 
+#create service
+kubectl create -f service-definition.yaml
+
+#get services
+kubectl get services
 
 #Create a Service named redis-service of type ClusterIP to expose pod redis on port 6379
 kubectl expose pod redis --port=6379 --name redis-service --dry-run=client -o yaml
@@ -253,6 +261,9 @@ kubectl get confimaps
 #describe confimaps
 kubectl describe configmaps
 
+#create config map in namespace
+kubectl create configmap ingress-nginx-controller --namespace ingress-nginx
+
 
 #----------------------------Secrets----------------------------------------
 #create secret imperative way
@@ -323,7 +334,8 @@ kubectl exec -it my-kubernetes-dashboard -- ls /var/run/secrets/kubernetes.io/se
 #connect to the pod and view secrets token file
 kubectl exec -it my-kubernetes-dashboard -- cat /var/run/secrets/kubernetes.io/serviceaccount/token
 
-
+#get roles
+kubectl get roles -n=ingress-nginx
 
         
 #---------------------taint and toleration----------------------
@@ -379,3 +391,84 @@ kubectl logs pod-name
 
 #delete job
 kubectl delete job math-add-job
+
+
+#------------- networkpolicy-------------------
+kubectl get networkpolicies
+
+
+
+#----------------------DEPLOY NGINX CONTROLLER------------------
+# 1. create namespace
+kubectl create namespace ingress-nginx
+
+#2. create config map
+kubectl creat configmap ingress-nginx
+
+#3. create serviceaccount
+kubectl create serviceaccount ingress-serviceaccount
+
+#4. create Role and RoleBinding for the service account
+
+#5. create deployment with definition file
+kubectl create -f dep.yaml
+
+#6. expose the deployment(create service NodePort)
+kubectl expose deploy ingress-controller --name ingress --port=80 --targetport=80 --type Nodeport
+
+#7. update the service to add the nodePort
+
+#8. create ingress ressources
+kubectl create ingress  simple --rule="/wear=wear-service:8080" --rule="/watch=video-service:8080"
+
+
+
+#--------------------Persistent Volume------------------
+
+#created persistent volume
+kubectl create -f pv-definition.yaml
+
+
+#-------------------------HELM------------------------------
+
+#install package
+helm install wordpress
+
+#upgrade package
+helm upgade wordpress
+
+#rollback package
+helm rollback wordpress
+
+#uninstall package
+helm uninstall wordpress
+
+#helm
+helm env
+#version
+helm version
+
+#helm search
+helm search hub wordpress
+
+#list installed packages
+helm  list
+
+#list repo
+helm  repo list
+
+#uninstall specific release package 
+helm  uninstall my-release
+
+#download package but not install it. --untar to unrchive(extract the context) the file
+helm  pull --untar bitnami/wordpress
+
+#search for charts
+artifacthub.io
+
+#search for charts in order repository(bitnami)
+    #1. add a repository to local helm setup
+        helm repo add bitnami https://charts.bitnami.com/bitnami
+
+    #2. search 
+        helm search repo wordpress

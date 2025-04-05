@@ -7,6 +7,11 @@ spec:
   ports:
     - port: 80
       targetPort: 80
-      nodePort: 30004
+      nodePort: 30008 #the range should be 30000-32767
   selector:
-    app: myapp
+    app: myapp #this is that connect the service and the pod
+
+#if you have mulitple pod that match the labels,
+#the service will load the req between pods like a load balancer in a random way
+
+#if the pods are di

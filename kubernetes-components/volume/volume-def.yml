@@ -1,0 +1,17 @@
+#pod with volume
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pd
+spec:
+  containers:
+    - image: registry.k8s.io/test-webserver
+      name: test-container
+      volumeMounts: #we mount the volume inside the container to be able to access in the container
+        - mountPath: /cache
+          name: cache-volume
+  volumes: #this volume will stored on the node
+    - name: cache-volume
+      hostPath:
+        path: /data
+        type: Directory

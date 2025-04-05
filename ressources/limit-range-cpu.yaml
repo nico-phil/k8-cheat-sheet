@@ -1,4 +1,4 @@
-#limit range can help you define default values to be set for containers with in a pod
+#limit range can help you define default values to be set for containers with in a pod for the namespace
 #cpu limit range for resource
 
 apiVersion: v1

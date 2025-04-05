@@ -1,0 +1,69 @@
+#nginx ingress-controller
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx-ingress-controlller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: nginx-ingress
+  template:
+    metadata:
+      labels:
+        name: nginx-ingress
+    spec:
+      containers:
+        - name: nginx-ingress-controller
+          image: quay.io/kubernetes-ingress-conroller/nginx-ingress-contoller:0.21.0
+      args:
+        - /nginx-ingress-contoller
+        - --configmap=$(POD NAMESPACE)/nginx-configuration
+      env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metatada.name
+
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metatada.name
+
+      ports:
+        - name: http
+          containerPort: 80
+        - name: https
+          containerPort: 443
+
+---
+#ConfigMap for ingress colltroller
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-configuration
+data:
+  APP_COLOR: blue
+  APP_MODE: prod
+
+#publish the ingress service as nodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-ingress
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+
+    - port: 443
+      targetPort: 443
+      protocol: TCP
+      name: https
+
+  selector:
+    app: nginx-ingress #this is that connect the service and the pod
