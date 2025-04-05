@@ -1,0 +1,53 @@
+#storage class to dynamically provision storage into google cloud.
+#it automatically create a persistent volue. we dont need to create persistent volume anymore
+apiVersion: storage.k8.io/v1
+kind: StorageClass
+metadata:
+  name: google-storage
+provisioner: kubernetes.io/gce-pd
+volumeBindingMode: WaitForFirstConsumer
+
+---
+#Create a new Storage Class called delayed-volume-sc that makes use of the below specs:
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: delayed-volume-sc
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+
+---
+#claim that used persistenv volume create by strogeclass
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: google-storage
+  resources:
+    requests:
+      storage: 500Mi
+
+---
+#pod that uses volume created by StorageClass
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  containers:
+    - name: event-simulator
+      image: kodekloud/event-simulator
+      env:
+        - name: LOG_HANDLERS
+          value: file
+      volumeMounts:
+        - mountPath: /log
+          name: log-volume
+
+  volumes:
+    - name: log-volume
+      persistentVolumeClaim:
+        claimName: myclaim

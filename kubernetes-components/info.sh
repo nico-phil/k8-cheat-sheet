@@ -472,3 +472,10 @@ artifacthub.io
 
     #2. search 
         helm search repo wordpress
+
+
+
+#----------------------StatefulSet-------------------
+
+#create stateful set
+kubectl create -f statefulset-def.yaml

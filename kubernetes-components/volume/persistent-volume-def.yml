@@ -1,4 +1,4 @@
-#persistent volume
+#persistent volume. the persistent volume is create by and admin. the value will be stored in the host
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -10,7 +10,7 @@ spec:
     storage: 1Gi
   hostPath: #do not do that on prod env
     path: /tmp/data
-  persistentVolumeReclaimPolicy: Retain
+  persistentVolumeReclaimPolicy: Retain #If the pvc is deleted. the data will remain but not available for resuse by other claims
 
 ---
 #persistent volume with aws elastic block store

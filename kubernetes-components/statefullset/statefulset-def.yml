@@ -1,0 +1,29 @@
+#stateful set.
+#the pod are deployed sequentially by default. you can modify the filed podMangementPolicy to parallel if you want to
+#each pod a stable unique DNS record on the network that any order application can use to access the pod
+#the podname will be predefined , in this case mysql-0, mysql-2, mysql-2
+#if you scale the pods, the pods becomes ready one after a another sequentially. this helps
+#to when you want to slace db(mysql) as each new instance can clone from the previous instance
+
+# the stateful automically apply the rigth subdomain to the pods base on the headless name service
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql
+  replicas: 3
+  serviceName: mysql-h #headless service name,
+
