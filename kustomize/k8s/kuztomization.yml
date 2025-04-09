@@ -1,0 +1,103 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - nginx-deployment.yaml #the path of yaml file
+  - nginx-service.yaml
+
+#customization that need to be made
+
+commonLabels:
+  company: kodekloud
+
+namespace: lab #common namespace. it's gonna add the namespace lab in all kubernetes resources
+
+namePrefix: kodkloud- #common prefix transanformer
+
+nameSuffix: -dev #common prefix transanformer
+
+commonAnnotations: #common tranformers for annotation
+  branch: master
+
+#image tranaformers
+images:
+  - name: nginx # select the pod with the image name nginx
+    newName: haproxy #change the name of the image
+    newTag: "2.4" #change the tag assign to the image
+
+#patches: its a another way to make changes in a kubernetes resources
+# the operation can be add/replace/remove
+#Json 6902 patch
+patches:
+  - target:
+      kind: Deployment
+      name: api-deployment
+
+    patch: |- #inline patches
+      - op: replace
+        path: /metadata/name
+        values: web-deployment
+
+  - target:
+      kind: Deployment
+      name: api-deployment
+
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        values: 5
+
+---
+#strategic merge patch
+patches:
+  - patch: |- #inline patches
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: api-deployment
+      spec: 
+        replicas: 5
+
+
+#you can put also the resource to be replaced  in a sepratef file
+---
+patches:
+  - path: replica-path.yaml
+    target:
+      kind: Deployment
+      name: api-deployment
+---
+#paches for list
+#change the first container name and image
+patches:
+  - target:
+      kind: Deployment
+      name: api-deployment
+
+    patch: |- #inline patches
+      - op: replace
+        path: /spec/template/spec/containers/0
+        value:
+          name: haproxy
+          image: haproxy
+
+---
+#add element
+patches:
+  - target:
+      kind: Deployment
+      name: api-deployment
+
+    patch: |- #inline patches
+      - op: add
+        path: /spec/template/spec/containers/-
+        value:
+          name: haproxy
+          image: haproxy
+
+
+---
+#delete element
+patches:
+  - label-patch.yaml
+ 
+
