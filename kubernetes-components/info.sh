@@ -479,3 +479,23 @@ artifacthub.io
 
 #create stateful set
 kubectl create -f statefulset-def.yaml
+
+
+
+#------------------- Kustomize------------------
+#build to file with kuztomize. it combines all the manifest and form the final config 
+#this command does not deploy the kuberntes resources to the cluster it just print the result in the terminal
+kustomize build k8s/
+
+#build and deploy
+kustomize build k8s/ | kubectl apply -f -
+
+
+kubectl apply -k k8s/
+
+
+#delete with kuztomize
+kustomize build k8s/ | kubectl delete -f -
+
+#delete with kubectl kuztomize
+kubectl delete -k k8s/
