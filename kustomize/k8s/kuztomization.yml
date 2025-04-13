@@ -35,7 +35,7 @@ patches:
     patch: |- #inline patches
       - op: replace
         path: /metadata/name
-        values: web-deployment
+        value: web-deployment
 
   - target:
       kind: Deployment
@@ -44,7 +44,7 @@ patches:
     patch: |-
       - op: replace
         path: /spec/replicas
-        values: 5
+        value: 5
 
 ---
 #strategic merge patch
@@ -94,10 +94,7 @@ patches:
           name: haproxy
           image: haproxy
 
-
 ---
 #delete element
 patches:
   - label-patch.yaml
- 
-
