@@ -23,3 +23,9 @@ kubectl get pods --as dev-user
 #check if a user can perform a certain action
 kubectl auth can-i create deployment
 kubectl auth can- delete nodes
+
+
+#--------------cluster roles-----------
+#get namespaced resource and non-namespaced resources
+kubectl api-resources --namespaced=true
+kubectl api-resources --namespaced=false
