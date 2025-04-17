@@ -29,3 +29,19 @@ kubectl auth can- delete nodes
 #get namespaced resource and non-namespaced resources
 kubectl api-resources --namespaced=true
 kubectl api-resources --namespaced=false
+
+
+
+#-----------------ADMISSION CONTROLLER----------------
+
+#view enabled admission controllers by default
+kube-apiserver -h | grep anable-admission-plugins
+
+#get api server pod
+kubectl get pod -n kube-system
+
+#conect to the apiserver pod and get admision controllers
+kubectl exec kube-apiserver-controlplane -n kube-system -- kube-apiserver -h | grep enable-admission-plugins
+
+
+#------------Kubesystem Pod--------------------------
